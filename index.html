@@ -102,23 +102,23 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--muted);f
         <h1>See how AI talks about your brand.</h1>
         <p class="lede">Measure how often ChatGPT, Gemini, Perplexity and others mention, recommend and cite you. Then fix the gaps with changes you approve, backed by evidence.</p>
 
-        <form id="wl" novalidate>
+        <form id="wl" action="https://docs.google.com/forms/d/e/1FAIpQLSf959Af3BCeKqBgFsmtOMRUjDM0fUG3ZHGvQSGvG5BJnNZorA/formResponse" method="POST" novalidate>
           <div class="row">
             <div class="field half">
               <label for="company">Company name</label>
-              <input id="company" name="company" type="text" autocomplete="organization" placeholder="Acme Inc." required>
+              <input id="company" name="entry.1334613217" type="text" autocomplete="organization" placeholder="Acme Inc." required>
             </div>
             <div class="field half">
               <label for="site">Company website</label>
-              <input id="site" name="site" type="text" inputmode="url" autocomplete="url" placeholder="acme.com" required>
+              <input id="site" name="entry.1570576543" type="text" inputmode="url" autocomplete="url" placeholder="acme.com" required>
             </div>
             <div class="field">
               <label for="email">Work email</label>
-              <input id="email" name="email" type="email" autocomplete="email" placeholder="you@company.com" required>
+              <input id="email" name="entry.1113672414" type="email" autocomplete="email" placeholder="you@company.com" required>
             </div>
             <div class="field">
               <label for="role">I’m signing up as</label>
-              <select id="role" name="role" required>
+              <select id="role" name="entry.190182054" required>
                 <option value="" disabled selected>Choose your role</option>
                 <option value="Business owner">Business owner</option>
                 <option value="Part of a marketing team">Part of a marketing team</option>
@@ -130,7 +130,7 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--muted);f
           <div class="hp" aria-hidden="true"><label>Leave empty<input name="website" tabindex="-1" autocomplete="off"></label></div>
           <button id="btn" type="submit">Join the waitlist</button>
           <p id="msg" role="status" aria-live="polite"></p>
-          <p class="note">Early access invitations only. No spam, and you can leave any time.</p>
+          <p class="note">Google Forms will confirm your submission. Early access invitations only. No spam, and you can leave any time.</p>
         </form>
       </div>
 
@@ -176,37 +176,22 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--muted);f
 </div>
 
 <script>
-// ---- GOOGLE FORM SETTINGS ----
-var FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf959Af3BCeKqBgFsmtOMRUjDM0fUG3ZHGvQSGvG5BJnNZorA/formResponse";
-var FIELDS = {
-  company: "entry.1334613217",  // Company Name
-  site:    "entry.1570576543",  // Website
-  email:   "entry.1113672414",  // Email
-  role:    "entry.190182054"   // Role
-};
-// ------------------------------
 document.getElementById("yr").textContent = new Date().getFullYear();
 var form = document.getElementById("wl"), msg = document.getElementById("msg"), btn = document.getElementById("btn");
 function say(t, c){ msg.textContent = t; msg.className = c || ""; }
 form.addEventListener("submit", function(e){
-  e.preventDefault();
-  if (form.website.value) return;
-  var company = form.company.value.trim(), site = form.site.value.trim(), email = form.email.value.trim(), role = form.role.value;
-  if (!company) { say("Enter your company name.", "err"); form.company.focus(); return; }
-  if (!/^(https?:\/\/)?[^\s.]+\.[^\s]{2,}$/.test(site)) { say("Enter your company website, like acme.com.", "err"); form.site.focus(); return; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { say("Enter a valid email address, like you@company.com.", "err"); form.email.focus(); return; }
-  if (!role) { say("Choose the role that fits you best.", "err"); form.role.focus(); return; }
-  if (JSON.stringify(FIELDS).indexOf("XXXX") > -1) { say("Setup needed: replace the entry.XXXXXXXXX IDs in the script with your Google Form field IDs.", "err"); return; }
-  btn.disabled = true; say("Saving your spot…");
-  var data = new URLSearchParams();
-  data.append(FIELDS.company, company);
-  data.append(FIELDS.site, site);
-  data.append(FIELDS.email, email);
-  data.append(FIELDS.role, role);
-  fetch(FORM_URL, { method: "POST", mode: "no-cors", body: data })
-    .then(function(){ form.reset(); say("You’re on the list. We’ll email you when early access opens.", "ok"); })
-    .catch(function(){ say("We couldn’t save your sign-up. Check your connection and try again.", "err"); })
-    .then(function(){ btn.disabled = false; });
+  // Submit directly to Google so its response confirms whether the sign-up saved.
+  if (form.elements.namedItem("website").value) { e.preventDefault(); return; }
+  var companyInput = document.getElementById("company"), siteInput = document.getElementById("site"), emailInput = document.getElementById("email"), roleInput = document.getElementById("role");
+  var company = companyInput.value.trim(), site = siteInput.value.trim(), email = emailInput.value.trim(), role = roleInput.value;
+  if (!company) { say("Enter your company name.", "err"); companyInput.focus(); e.preventDefault(); return; }
+  if (!/^(https?:\/\/)?[^\s.]+\.[^\s]{2,}$/.test(site)) { say("Enter your company website, like acme.com.", "err"); siteInput.focus(); e.preventDefault(); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { say("Enter a valid email address, like you@company.com.", "err"); emailInput.focus(); e.preventDefault(); return; }
+  if (!role) { say("Choose the role that fits you best.", "err"); roleInput.focus(); e.preventDefault(); return; }
+  companyInput.value = company;
+  siteInput.value = site;
+  emailInput.value = email;
+  say("Opening Google Forms to confirm your sign-up…");
 });
 </script>
 </body>
